@@ -32,8 +32,6 @@ function main(ARGUMENTS) {
         console.error("--- " + ACTUAL_QUANTITY_ARGUMENTS + ".");
         console.error("Your arguments were:");
         console.error("--- " + JSON.stringify(ARGUMENTS));
-        console.error("Argument reference:");
-        console.error("--- Argument 1: Message Body");
     }
 }
 
