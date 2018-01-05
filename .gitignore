@@ -1,0 +1,5 @@
+.idea/
+old/
+config/config.json
+cmd/crypto_price_fetcher.exe
+crypto-price-fetcher.iml
