@@ -21,10 +21,9 @@ func SpecificCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
 		Respond(w, Response{Message: "No crypto-currency with id \"" + id + "\" was found."})
 		return
 	}
-	currency := models.Currency{Name: currencyFromCMC.Name, Symbol: currencyFromCMC.Symbol, CurrentPriceInUSD: currencyFromCMC.CurrentPriceInUSD, CurrentPriceInBTC: currencyFromCMC.CurrentPriceInBTC}
 
 	type Response models.Currency
-	Respond(w, Response{Name: currency.Name, Symbol: currency.Symbol, CurrentPriceInUSD: currency.CurrentPriceInUSD, CurrentPriceInBTC: currency.CurrentPriceInBTC})
+	Respond(w, Response{Name: currencyFromCMC.Name, Symbol: currencyFromCMC.Symbol, ID: currencyFromCMC.Id, CurrentPriceInUSD: currencyFromCMC.CurrentPriceInUSD, CurrentPriceInBTC: currencyFromCMC.CurrentPriceInBTC})
 }
 
 func MultipleCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
@@ -49,7 +48,7 @@ func MultipleCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
 	}
 	currencies := make([]models.Currency, len(currenciesFromCMC))
 	for i, currencyFromCMC := range currenciesFromCMC {
-		currencies[i] = models.Currency{Name: currencyFromCMC.Name, Symbol: currencyFromCMC.Symbol, CurrentPriceInUSD: currencyFromCMC.CurrentPriceInUSD, CurrentPriceInBTC: currencyFromCMC.CurrentPriceInBTC}
+		currencies[i] = models.Currency{Name: currencyFromCMC.Name, Symbol: currencyFromCMC.Symbol, ID: currencyFromCMC.Id, CurrentPriceInUSD: currencyFromCMC.CurrentPriceInUSD, CurrentPriceInBTC: currencyFromCMC.CurrentPriceInBTC}
 	}
 
 	type Response struct {

@@ -8,6 +8,8 @@ import (
 	"log"
 	"net/http"
 	"strconv"
+	"crypto-price-fetcher/pkg/database"
+	"crypto-price-fetcher/pkg/engine/job"
 )
 
 var config models.Config
@@ -15,14 +17,11 @@ var config models.Config
 func main() () {
 	configure()
 
-	//currencies := services.GetCurrencies([]string{"raiblocks", "bitcoin", "iota", "siacoin", "dash"})
-	//message := ""
-	//for _, currency := range currencies {
-	//	message += currency.Name + " (" + currency.CoinMarketCapRank + ") - $" + currency.CurrentPriceInUSD + "/Ƀ" + currency.CurrentPriceInBTC + " | 1h: " + currency.PercentChangeInOneHour + ", 1d: " + currency.PercentChangeInOneDay + ", 1w: " + currency.PercentChangeInOneWeek + "\n"
-	//}
-	//fmt.Printf(message)
-
 	// TODO: Some way to resume all jobs from last run. Possibly by storing them in a json file or something.
+
+	go job.StartEngine(config)
+	//go watcher.StartEngine(config)
+
 	router := models.CreateRouter()
 	router = routes.CreateRoutes(router)
 	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(config.Port), router))
@@ -30,6 +29,7 @@ func main() () {
 
 func configure() () {
 	populateConfig()
+	database.InitializeDatabase(config)
 }
 
 func populateConfig() () {

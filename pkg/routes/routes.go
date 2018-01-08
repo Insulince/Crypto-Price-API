@@ -20,10 +20,10 @@ func CreateRoutes(router *models.Router) (*models.Router) {
 	router.HandleFunc("/job/{id}", handlers.GetJob).Methods("GET")
 	router.HandleFunc("/job/{id}", handlers.UpdateJob).Methods("PUT")
 	router.HandleFunc("/job/{id}", handlers.DeleteJob).Methods("DELETE")
-	router.HandleFunc("/job/start", handlers.StartProcessingProvidedJobs).Methods("POST")
-	router.HandleFunc("/job/stop", handlers.StopProcessingAllJobs).Methods("GET")
-	router.HandleFunc("/job/start/{id}", handlers.StartProcessingJob).Methods("GET")
-	router.HandleFunc("/job/stop/{id}", handlers.StopProcessingJob).Methods("GET")
+	router.HandleFunc("/job/start", handlers.StartProvidedJobs).Methods("POST")
+	router.HandleFunc("/job/stop", handlers.StopAllJobs).Methods("GET")
+	router.HandleFunc("/job/start/{id}", handlers.StartJob).Methods("GET")
+	router.HandleFunc("/job/stop/{id}", handlers.StopJob).Methods("GET")
 
 	router.NotFoundHandler = http.HandlerFunc(handlers.NotFound)
 

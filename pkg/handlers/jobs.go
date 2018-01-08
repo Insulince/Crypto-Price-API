@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"net/http"
+	"crypto-price-fetcher/pkg/database"
+	"crypto-price-fetcher/pkg/models"
 )
 
 func GetJobs(w http.ResponseWriter, r *http.Request) () {
@@ -14,6 +16,8 @@ func GetJobs(w http.ResponseWriter, r *http.Request) () {
 
 func CreateJob(w http.ResponseWriter, r *http.Request) () {
 	CallReceived(r)
+
+	database.CreateJob(models.Job{WaitDuration: 5})
 
 	type Response struct {
 	}
@@ -44,7 +48,7 @@ func DeleteJob(w http.ResponseWriter, r *http.Request) () {
 	Respond(w, Response{})
 }
 
-func StartProcessingProvidedJobs(w http.ResponseWriter, r *http.Request) () {
+func StartProvidedJobs(w http.ResponseWriter, r *http.Request) () {
 	CallReceived(r)
 
 	type Response struct {
@@ -52,7 +56,7 @@ func StartProcessingProvidedJobs(w http.ResponseWriter, r *http.Request) () {
 	Respond(w, Response{})
 }
 
-func StopProcessingAllJobs(w http.ResponseWriter, r *http.Request) () {
+func StopAllJobs(w http.ResponseWriter, r *http.Request) () {
 	CallReceived(r)
 
 	type Response struct {
@@ -60,16 +64,22 @@ func StopProcessingAllJobs(w http.ResponseWriter, r *http.Request) () {
 	Respond(w, Response{})
 }
 
-func StartProcessingJob(w http.ResponseWriter, r *http.Request) () {
-	CallReceived(r)
+func StartJob(w http.ResponseWriter, r *http.Request) () {
+	routeVariables, _, _ := CallReceived(r)
+	id := routeVariables["id"]
+
+	database.StartJob(id)
 
 	type Response struct {
 	}
 	Respond(w, Response{})
 }
 
-func StopProcessingJob(w http.ResponseWriter, r *http.Request) () {
-	CallReceived(r)
+func StopJob(w http.ResponseWriter, r *http.Request) () {
+	routeVariables, _, _ := CallReceived(r)
+	id := routeVariables["id"]
+
+	database.StopJob(id)
 
 	type Response struct {
 	}
