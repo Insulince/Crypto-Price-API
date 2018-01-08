@@ -5,12 +5,22 @@ import (
 	"crypto-price-fetcher/pkg/services"
 	"encoding/json"
 	"crypto-price-fetcher/pkg/models"
+	"strings"
 )
 
 func SpecificCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
 	routeVariables, _, _ := CallReceived(r)
+	id := routeVariables["id"]
 
-	currencyFromCMC := services.GetCurrency(routeVariables["id"])
+	currencyFromCMC, err := services.GetCurrency(id)
+	if err != nil {
+		if err.Error() != "id not found" {
+			panic(err)
+		}
+		type Response models.Error
+		Respond(w, Response{Message: "No crypto-currency with id \"" + id + "\" was found."})
+		return
+	}
 	currency := models.Currency{Name: currencyFromCMC.Name, Symbol: currencyFromCMC.Symbol, CurrentPriceInUSD: currencyFromCMC.CurrentPriceInUSD, CurrentPriceInBTC: currencyFromCMC.CurrentPriceInBTC}
 
 	type Response models.Currency
@@ -23,9 +33,20 @@ func MultipleCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
 		Ids []string `json:"ids"`
 	}
 	var body Body
-	json.Unmarshal(postBody, &body)
+	err := json.Unmarshal(postBody, &body)
+	if err != nil {
+		panic(err)
+	}
 
-	currenciesFromCMC := services.GetCurrencies(body.Ids)
+	currenciesFromCMC, err := services.GetCurrencies(body.Ids)
+	if err != nil {
+		if err.Error() != "id not found" {
+			panic(err)
+		}
+		type Response models.Error
+		Respond(w, Response{Message: "One of the provided crypto-currency ids was not recognized. Provided ids were \"" + strings.Join(body.Ids, "\", \"") + "\"."})
+		return
+	}
 	currencies := make([]models.Currency, len(currenciesFromCMC))
 	for i, currencyFromCMC := range currenciesFromCMC {
 		currencies[i] = models.Currency{Name: currencyFromCMC.Name, Symbol: currencyFromCMC.Symbol, CurrentPriceInUSD: currencyFromCMC.CurrentPriceInUSD, CurrentPriceInBTC: currencyFromCMC.CurrentPriceInBTC}

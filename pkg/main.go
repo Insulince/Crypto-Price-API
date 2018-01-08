@@ -38,5 +38,8 @@ func populateConfig() () {
 		panic(err)
 	}
 
-	json.Unmarshal(jsonFile, &config)
+	err = json.Unmarshal(jsonFile, &config)
+	if err != nil {
+		panic(err)
+	}
 }
