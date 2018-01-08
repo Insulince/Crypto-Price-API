@@ -1,10 +1,10 @@
-package models
+package coin_market_cap
 
-type CMCCurrency struct {
+type Currency struct {
 	Id                           string `json:"id"`
 	Name                         string `json:"name"`
 	Symbol                       string `json:"symbol"`
-	CMCRank                      string `json:"rank"`
+	CoinMarketCapRank            string `json:"rank"`
 	CurrentPriceInUSD            string `json:"price_usd"`
 	CurrentPriceInBTC            string `json:"price_btc"`
 	VolumeInTwentyFourHoursInUSD string `json:"24h_volume_usd"`

@@ -1,4 +1,4 @@
-package twilio
+package services
 
 import (
 	"net/url"
@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"crypto-price-fetcher/pkg/models"
+	"crypto-price-fetcher/pkg/models/twilio"
 )
 
 func SendMessage(config models.Config, message string) () {
@@ -30,7 +31,7 @@ func SendMessage(config models.Config, message string) () {
 	}
 	defer response.Body.Close()
 	if response.StatusCode >= 200 && response.StatusCode < 300 {
-		var twilioResponse models.TwilioResponse
+		var twilioResponse twilio.Response
 		err := json.NewDecoder(response.Body).Decode(&twilioResponse)
 		if err != nil {
 			panic(err)

@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"crypto-price-fetcher/pkg/models"
-	"crypto-price-fetcher/pkg/coin-market-cap"
-	"crypto-price-fetcher/pkg/twilio"
-	"fmt"
+	"crypto-price-fetcher/pkg/routes"
+	"log"
+	"net/http"
+	"strconv"
 )
 
 var config models.Config
@@ -14,17 +15,17 @@ var config models.Config
 func main() () {
 	configure()
 
-	currencies := coin_market_cap.GetCurrencies([]string{"raiblocks", "bitcoin", "iota", "siacoin", "dash"})
+	//currencies := services.GetCurrencies([]string{"raiblocks", "bitcoin", "iota", "siacoin", "dash"})
+	//message := ""
+	//for _, currency := range currencies {
+	//	message += currency.Name + " (" + currency.CoinMarketCapRank + ") - $" + currency.CurrentPriceInUSD + "/Ƀ" + currency.CurrentPriceInBTC + " | 1h: " + currency.PercentChangeInOneHour + ", 1d: " + currency.PercentChangeInOneDay + ", 1w: " + currency.PercentChangeInOneWeek + "\n"
+	//}
+	//fmt.Printf(message)
 
-	message := ""
-
-	for _, currency := range currencies {
-		message += currency.Name + " (" + currency.CMCRank + ") - $" + currency.CurrentPriceInUSD + "/Ƀ" + currency.CurrentPriceInBTC + " | 1h: " + currency.PercentChangeInOneHour + ", 1d: " + currency.PercentChangeInOneDay + ", 1w: " + currency.PercentChangeInOneWeek + "\n"
-	}
-
-	fmt.Printf(message)
-
-	twilio.SendMessage(config, message)
+	// TODO: Some way to resume all jobs from last run. Possibly by storing them in a json file or something.
+	router := models.CreateRouter()
+	router = routes.CreateRoutes(router)
+	log.Fatal(http.ListenAndServe(":"+strconv.Itoa(config.Port), router))
 }
 
 func configure() () {

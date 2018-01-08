@@ -6,4 +6,5 @@ type Config struct {
 	TwilioAPIURL        string `json:"twilio-api-url"`
 	SenderPhoneNumber   string `json:"sender-phone-number"`
 	ReceiverPhoneNumber string `json:"receiver-phone-number"`
+	Port                int    `json:"port"`
 }
