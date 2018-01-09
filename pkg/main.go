@@ -8,19 +8,12 @@ import (
 	"log"
 	"net/http"
 	"strconv"
-	"crypto-price-fetcher/pkg/database"
-	"crypto-price-fetcher/pkg/engine/job"
 )
 
 var config models.Config
 
 func main() () {
 	configure()
-
-	// TODO: Some way to resume all jobs from last run. Possibly by storing them in a json file or something.
-
-	go job.StartEngine(config)
-	//go watcher.StartEngine(config)
 
 	router := models.CreateRouter()
 	router = routes.CreateRoutes(router)
@@ -29,7 +22,6 @@ func main() () {
 
 func configure() () {
 	populateConfig()
-	database.InitializeDatabase(config)
 }
 
 func populateConfig() () {
