@@ -2,12 +2,18 @@ package handlers
 
 import (
 	"net/http"
-	"crypto-price-fetcher/pkg/models"
+	"fmt"
+	"os"
+	"crypto-price-fetcher/pkg/models/responses"
 )
 
 func HealthCheck(w http.ResponseWriter, r *http.Request) () {
-	CallReceived(r)
+	_, _, _, err := CallReceived(r)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		Respond(w, responses.Error{Message: "Could not process request."})
+		return
+	}
 
-	type Response models.Message
-	Respond(w, Response{Message: "OK"})
+	Respond(w, responses.Message{Message: "OK"})
 }

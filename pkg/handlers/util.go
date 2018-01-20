@@ -6,26 +6,31 @@ import (
 	"github.com/gorilla/mux"
 	"io/ioutil"
 	"encoding/json"
+	"errors"
+	"os"
 )
 
-func CallReceived(r *http.Request) (routeVariables map[string]string, queryParameters map[string][]string, requestBody []byte) {
+func CallReceived(r *http.Request) (routeVariables map[string]string, queryParameters map[string][]string, requestBody []byte, err error) {
 	fmt.Printf("Call Received: \"" + r.Method + " " + r.URL.Path + "\"\n")
 	return getRequestInformation(r)
 }
 
-func getRequestInformation(r *http.Request) (routeVariables map[string]string, queryParameters map[string][]string, requestBody []byte) {
-	requestBody, err := ioutil.ReadAll(r.Body)
+func getRequestInformation(r *http.Request) (routeVariables map[string]string, queryParameters map[string][]string, requestBody []byte, err error) {
+	requestBody, err = ioutil.ReadAll(r.Body)
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, err)
+		return nil, nil, nil, errors.New("Could not read request body.")
 	}
-	return mux.Vars(r), r.URL.Query(), requestBody
+	return mux.Vars(r), r.URL.Query(), requestBody, nil
 }
 
 func Respond(w http.ResponseWriter, response interface{}) () {
 	w.Header().Set("Content-Type", "application/json")
 	responseBody, err := json.Marshal(response)
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, err)
+		fmt.Fprintf(w, "{\n\t\"message\": \"Could not process response body.\"\n}")
+		return
 	}
 	fmt.Fprintf(w, string(responseBody))
 }

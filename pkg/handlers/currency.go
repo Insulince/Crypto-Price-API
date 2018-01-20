@@ -6,19 +6,29 @@ import (
 	"encoding/json"
 	"crypto-price-fetcher/pkg/models"
 	"strings"
+	"fmt"
+	"os"
+	"crypto-price-fetcher/pkg/models/responses"
 )
 
 func SpecificCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
-	routeVariables, _, _ := CallReceived(r)
+	routeVariables, _, _, err := CallReceived(r)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		Respond(w, responses.Error{Message: "Could not process request."})
+		return
+	}
+
 	id := routeVariables["id"]
 
 	currencyFromCMC, err := services.GetCurrency(id)
 	if err != nil {
 		if err.Error() != "id not found" {
-			panic(err)
+			fmt.Fprintln(os.Stderr, err)
+			Respond(w, responses.Error{Message: "Unexpected error encountered."})
+			return
 		}
-		type Response models.Error
-		Respond(w, Response{Message: "No crypto-currency with id \"" + id + "\" was found."})
+		Respond(w, responses.Error{Message: "No crypto-currency with id \"" + id + "\" was found."})
 		return
 	}
 
@@ -27,23 +37,32 @@ func SpecificCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
 }
 
 func MultipleCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
-	_, _, postBody := CallReceived(r)
-	type Body struct {
-		Ids []string `json:"ids"`
-	}
-	var body Body
-	err := json.Unmarshal(postBody, &body)
+	_, _, rawPostBody, err := CallReceived(r)
 	if err != nil {
-		panic(err)
+		fmt.Fprintln(os.Stderr, err)
+		Respond(w, responses.Error{Message: "Could not process request."})
+		return
 	}
 
-	currenciesFromCMC, err := services.GetCurrencies(body.Ids)
+	type PostBody struct {
+		Ids []string `json:"ids"`
+	}
+	var postBody PostBody
+	err = json.Unmarshal(rawPostBody, &postBody)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		Respond(w, responses.Message{Message: "Could not read request body."})
+		return
+	}
+
+	currenciesFromCMC, err := services.GetCurrencies(postBody.Ids)
 	if err != nil {
 		if err.Error() != "id not found" {
-			panic(err)
+			fmt.Fprintln(os.Stderr, err)
+			Respond(w, responses.Error{Message: "Unexpected error encountered."})
+			return
 		}
-		type Response models.Error
-		Respond(w, Response{Message: "One of the provided crypto-currency ids was not recognized. Provided ids were \"" + strings.Join(body.Ids, "\", \"") + "\"."})
+		Respond(w, responses.Error{Message: "One of the provided crypto-currency ids was not recognized. Provided ids were \"" + strings.Join(postBody.Ids, "\", \"") + "\"."})
 		return
 	}
 	currencies := make([]models.Currency, len(currenciesFromCMC))
@@ -58,7 +77,12 @@ func MultipleCurrencyFetch(w http.ResponseWriter, r *http.Request) () {
 }
 
 func GlobalDataFetch(w http.ResponseWriter, r *http.Request) () {
-	CallReceived(r)
+	_, _, _, err := CallReceived(r)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		Respond(w, responses.Error{Message: "Could not process request."})
+		return
+	}
 
 	globalDataFromCMC := services.GetGlobalData()
 
